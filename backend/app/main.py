@@ -13,7 +13,7 @@ tokenizer,model=load_model()
 @app.post("/review_code")
 async def review(request:CodeRequest):
     code=request.code
-    print("✅ Received code:", code[:100])  # first 100 chars
-    print("✅ Starting generation...")
+    print("Received code:", code[:100])  # first 100 chars
+    print("Starting generation...")
     result=review_code(code,tokenizer,model)
     return {"review":result}
