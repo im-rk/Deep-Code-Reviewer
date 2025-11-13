@@ -2,11 +2,13 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 
 def load_model():
-    model_name="meta-llama/CodeLlama-7b-Instruct-hf"
+    model_name = "deepseek-ai/deepseek-coder-1.3b-instruct"
+    print("✅ Loading model...")
     tokenizer=AutoTokenizer.from_pretrained(model_name)
     model=AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=torch.float16,
-        device_map="auto"
+        device_map="auto",
+        load_in_4bit=True
     )
+    print("✅ Model loaded successfully!")
     return tokenizer,model
