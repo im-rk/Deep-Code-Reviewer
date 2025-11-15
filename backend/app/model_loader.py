@@ -2,8 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 from dotenv import load_dotenv
-# base_dir=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# env_path=os.path.join(base_dir,".env")
+
 load_dotenv()
 class LLMclient:
     def __init__(self):
