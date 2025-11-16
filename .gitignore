@@ -1,2 +1,4 @@
 venv/
 backend/.env
+vscode-extension/deep-code-reviewer/node_modules/
+vscode-extension/deep-code-reviewer/out/
