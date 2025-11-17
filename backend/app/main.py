@@ -6,6 +6,8 @@ from pydantic import BaseModel
 # Define request schema
 class CodeRequest(BaseModel):
     code: str
+    language: str | None=None
+    fileName: str | None=None
 
 app=FastAPI()
 llm=LLMclient()
@@ -13,7 +15,9 @@ llm=LLMclient()
 @app.post("/review_code")
 async def review(request:CodeRequest):
     code=request.code
+    language=request.language
+    file_name=request.fileName
     print("Received code:", code[:100])  # first 100 chars
     print("Starting generation...")
-    result=review_code(code,llm)
+    result=review_code(code,llm,language,file_name)
     return {"review":result}
