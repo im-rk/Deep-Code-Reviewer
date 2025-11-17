@@ -2,6 +2,17 @@ import * as vscode from "vscode";
 
 let diagnosticCollection = vscode.languages.createDiagnosticCollection("deep-code-review");
 
+type ReviewResponse={
+	summary : string;
+	issues : Array<{
+		type:string,
+		description:string;
+		line:number;
+		suggestion:string;
+	}>;
+	overall_suggestion:string;
+}
+
 export function activate(context: vscode.ExtensionContext) {
     console.log("Deep Code Reviewer Activated!");
 
@@ -40,8 +51,8 @@ export function activate(context: vscode.ExtensionContext) {
                         }),
                     });
 
-                    const result = await response.json();
-
+                    const json = await response.json();
+					const result=json as ReviewResponse;
                     applyDiagnostics(document, result.issues);
                     vscode.window.showInformationMessage("Review completed!");
 
