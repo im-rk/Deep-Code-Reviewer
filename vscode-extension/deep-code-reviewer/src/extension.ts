@@ -1,17 +1,10 @@
 import * as vscode from "vscode";
+import type {ReviewResponse} from "./types";
+import { applyDiagnostics } from "./diagnostics";
 
 let diagnosticCollection = vscode.languages.createDiagnosticCollection("deep-code-review");
 
-type ReviewResponse={
-	summary : string;
-	issues : Array<{
-		type:string,
-		description:string;
-		line:number;
-		suggestion:string;
-	}>;
-	overall_suggestion:string;
-}
+
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("Deep Code Reviewer Activated!");
@@ -67,30 +60,5 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(diagnosticCollection);
 }
 
-function applyDiagnostics(document: vscode.TextDocument, issues: any[]) {
-	const diagnostics: vscode.Diagnostic[] = [];
-
-	issues.forEach(issue => {
-		const lineIndex = Number(issue.line) - 1;
-		if (lineIndex < 0 || lineIndex >= document.lineCount) return;
-
-		const range = new vscode.Range(
-			lineIndex,
-			0,
-			lineIndex,
-			document.lineAt(lineIndex).text.length
-		);
-
-		const diagnostic = new vscode.Diagnostic(
-			range,
-			`[${issue.type}] ${issue.description}\nSuggestion: ${issue.suggestion}`,
-			vscode.DiagnosticSeverity.Warning
-		);
-
-		diagnostics.push(diagnostic);
-	});
-
-	diagnosticCollection.set(document.uri, diagnostics);
-}
 
 export function deactivate() {}
