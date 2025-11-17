@@ -1,26 +1,85 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
+import * as vscode from "vscode";
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+let diagnosticCollection = vscode.languages.createDiagnosticCollection("deep-code-review");
+
 export function activate(context: vscode.ExtensionContext) {
+    console.log("Deep Code Reviewer Activated!");
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "deep-code-reviewer" is now active!');
+    let disposable = vscode.commands.registerCommand("deepCodeReviewer.reviewCode", async () => {
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('deep-code-reviewer.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from deep-code-reviewer!');
-	});
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showInformationMessage("Open a file to review.");
+            return;
+        }
 
-	context.subscriptions.push(disposable);
+        const document = editor.document;
+        const language = document.languageId;
+        const fileName = document.fileName.split("/").pop();
+
+        let code = editor.document.getText(editor.selection);
+        if (!code || code.trim().length === 0) {
+            code = editor.document.getText();
+        }
+
+        vscode.window.withProgress(
+            {
+                location: vscode.ProgressLocation.Notification,
+                title: "Reviewing code with AI...",
+                cancellable: false,
+            },
+            async () => {
+                try {
+                    const response = await fetch("http://localhost:8000/review_code", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            code: code,
+                            language: language,
+                            fileName: fileName,
+                        }),
+                    });
+
+                    const result = await response.json();
+
+                    applyDiagnostics(document, result.issues);
+                    vscode.window.showInformationMessage("Review completed!");
+
+                } catch (error: any) {
+                    vscode.window.showErrorMessage("Error reviewing code: " + error.message);
+                }
+            }
+        );
+    });
+
+    context.subscriptions.push(disposable);
+    context.subscriptions.push(diagnosticCollection);
 }
 
-// This method is called when your extension is deactivated
+function applyDiagnostics(document: vscode.TextDocument, issues: any[]) {
+    const diagnostics: vscode.Diagnostic[] = [];
+
+    issues.forEach(issue => {
+        const lineIndex = Number(issue.line) - 1;
+        if (lineIndex < 0 || lineIndex >= document.lineCount) return;
+
+        const range = new vscode.Range(
+            lineIndex,
+            0,
+            lineIndex,
+            document.lineAt(lineIndex).text.length
+        );
+
+        const diagnostic = new vscode.Diagnostic(
+            range,
+            `[${issue.type}] ${issue.description}\nSuggestion: ${issue.suggestion}`,
+            vscode.DiagnosticSeverity.Warning
+        );
+
+        diagnostics.push(diagnostic);
+    });
+
+    diagnosticCollection.set(document.uri, diagnostics);
+}
+
 export function deactivate() {}
