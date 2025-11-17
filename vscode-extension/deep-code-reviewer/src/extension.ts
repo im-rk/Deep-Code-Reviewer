@@ -14,83 +14,83 @@ type ReviewResponse={
 }
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log("Deep Code Reviewer Activated!");
+	console.log("Deep Code Reviewer Activated!");
 
-    let disposable = vscode.commands.registerCommand("deepCodeReviewer.reviewCode", async () => {
+	let disposable = vscode.commands.registerCommand("deepCodeReviewer.reviewCode", async () => {
 
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showInformationMessage("Open a file to review.");
-            return;
-        }
+		const editor = vscode.window.activeTextEditor;
+		if (!editor) {
+			vscode.window.showInformationMessage("Open a file to review.");
+			return;
+		}
 
-        const document = editor.document;
-        const language = document.languageId;
-        const fileName = document.fileName.split("/").pop();
+		const document = editor.document;
+		const language = document.languageId;
+		const fileName = document.fileName.split("/").pop();
 
-        let code = editor.document.getText(editor.selection);
-        if (!code || code.trim().length === 0) {
-            code = editor.document.getText();
-        }
+		let code = editor.document.getText(editor.selection);
+		if (!code || code.trim().length === 0) {
+			code = editor.document.getText();
+		}
 
-        vscode.window.withProgress(
-            {
-                location: vscode.ProgressLocation.Notification,
-                title: "Reviewing code with AI...",
-                cancellable: false,
-            },
-            async () => {
-                try {
-                    const response = await fetch("http://localhost:8000/review_code", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            code: code,
-                            language: language,
-                            fileName: fileName,
-                        }),
-                    });
+		vscode.window.withProgress(
+			{
+				location: vscode.ProgressLocation.Notification,
+				title: "Reviewing code with AI...",
+				cancellable: false,
+			},
+			async () => {
+				try {
+					const response = await fetch("http://localhost:8000/review_code", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							code: code,
+							language: language,
+							fileName: fileName,
+						}),
+					});
 
-                    const json = await response.json();
+					const json = await response.json();
 					const result=json as ReviewResponse;
-                    applyDiagnostics(document, result.issues);
-                    vscode.window.showInformationMessage("Review completed!");
+					applyDiagnostics(document, result.issues);
+					vscode.window.showInformationMessage("Review completed!");
 
-                } catch (error: any) {
-                    vscode.window.showErrorMessage("Error reviewing code: " + error.message);
-                }
-            }
-        );
-    });
+				} catch (error: any) {
+					vscode.window.showErrorMessage("Error reviewing code: " + error.message);
+				}
+			}
+		);
+	});
 
-    context.subscriptions.push(disposable);
-    context.subscriptions.push(diagnosticCollection);
+	context.subscriptions.push(disposable);
+	context.subscriptions.push(diagnosticCollection);
 }
 
 function applyDiagnostics(document: vscode.TextDocument, issues: any[]) {
-    const diagnostics: vscode.Diagnostic[] = [];
+	const diagnostics: vscode.Diagnostic[] = [];
 
-    issues.forEach(issue => {
-        const lineIndex = Number(issue.line) - 1;
-        if (lineIndex < 0 || lineIndex >= document.lineCount) return;
+	issues.forEach(issue => {
+		const lineIndex = Number(issue.line) - 1;
+		if (lineIndex < 0 || lineIndex >= document.lineCount) return;
 
-        const range = new vscode.Range(
-            lineIndex,
-            0,
-            lineIndex,
-            document.lineAt(lineIndex).text.length
-        );
+		const range = new vscode.Range(
+			lineIndex,
+			0,
+			lineIndex,
+			document.lineAt(lineIndex).text.length
+		);
 
-        const diagnostic = new vscode.Diagnostic(
-            range,
-            `[${issue.type}] ${issue.description}\nSuggestion: ${issue.suggestion}`,
-            vscode.DiagnosticSeverity.Warning
-        );
+		const diagnostic = new vscode.Diagnostic(
+			range,
+			`[${issue.type}] ${issue.description}\nSuggestion: ${issue.suggestion}`,
+			vscode.DiagnosticSeverity.Warning
+		);
 
-        diagnostics.push(diagnostic);
-    });
+		diagnostics.push(diagnostic);
+	});
 
-    diagnosticCollection.set(document.uri, diagnostics);
+	diagnosticCollection.set(document.uri, diagnostics);
 }
 
 export function deactivate() {}
