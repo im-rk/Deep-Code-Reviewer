@@ -14,8 +14,8 @@
   "contributes": {
     "commands": [
       {
-        "command": "deep-code-reviewer.helloWorld",
-        "title": "Hello World"
+        "command": "deepCodeReviewer.reviewCode",
+        "title": "Deep Code Reviewer : Review Code"
       }
     ],
     "menus": {

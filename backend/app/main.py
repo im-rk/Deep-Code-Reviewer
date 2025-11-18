@@ -20,4 +20,5 @@ async def review(request:CodeRequest):
     print("Received code:", code[:100])  # first 100 chars
     print("Starting generation...")
     result=review_code(code,llm,language,file_name)
-    return {"review":result}
+    print(result)
+    return result

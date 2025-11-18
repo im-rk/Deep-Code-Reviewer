@@ -28,21 +28,28 @@ class LLMclient:
             - Keep feedback concise, structured, and developer-friendly.
             - Prioritize correctness and security over style.
             - If code is incomplete or ambiguous, mention assumptions.
+            - Ensure strict JSON compliance.
 
-            Return the output ONLY in the following JSON format:
+            VERY IMPORTANT:
+            - Return ONLY a valid JSON object.
+            - Do NOT include backticks, markdown, comments, or text outside JSON.
+            - Do NOT explain anything outside the expected JSON output format.
+
+            JSON Format:
             {{
-            "summary": "",
-            "issues": [
-                {{
-                "type": "bug | security | performance | style | best_practice",
-                "description": "",
-                "line": "",
-                "suggestion": ""
-                }}
-            ],
-            "overall_suggestion": ""
+                "summary": "",
+                "issues": [
+                    {{
+                        "type": "bug | security | performance | style | best_practice",
+                        "description": "",
+                        "line": "",
+                        "suggestion": ""
+                    }}
+                ],
+                "overall_suggestion": ""
             }}
             '''
+
 
         chat_prompt=ChatPromptTemplate.from_messages(
             [
