@@ -1,14 +1,14 @@
 import * as vscode from "vscode";
 import type {ReviewResponse} from "./types";
 import { applyDiagnostics } from "./diagnostics";
-
+import { registerHoverProvider } from "./hover";
 let diagnosticCollection = vscode.languages.createDiagnosticCollection("deep-code-review");
 
 
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("Deep Code Reviewer Activated!");
-
+	registerHoverProvider(context);
 	let disposable = vscode.commands.registerCommand("deepCodeReviewer.reviewCode", async () => {
 
 		const editor = vscode.window.activeTextEditor;

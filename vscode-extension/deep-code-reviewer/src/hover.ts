@@ -11,7 +11,6 @@ export function registerHoverProvider(context: vscode.ExtensionContext) {
 
         let suggestion: string;
 
-        // Safely extract suggestion depending on type
         if (typeof match.code === "object" && match.code !== null && "value" in match.code) {
           suggestion = String(match.code.value);
         } else {
