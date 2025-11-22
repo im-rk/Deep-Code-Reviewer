@@ -22,9 +22,12 @@ class LLMclient:
             - Detect bugs, logical errors, anti-patterns, security vulnerabilities,
             performance issues, and style problems.
             - Suggest clear, actionable fixes.
+            - Provide exact corrected code segments that the editor can directly replace.
+
 
             Rules:
             - Do NOT rewrite entire code unless necessary.
+            - Only return corrected code for the specific issue, nothing else.
             - Keep feedback concise, structured, and developer-friendly.
             - Prioritize correctness and security over style.
             - If code is incomplete or ambiguous, mention assumptions.
@@ -43,7 +46,8 @@ class LLMclient:
                         "type": "bug | security | performance | style | best_practice",
                         "description": "",
                         "line": "",
-                        "suggestion": ""
+                        "suggestion": "",
+                        "corrected":""
                     }}
                 ],
                 "overall_suggestion": ""
