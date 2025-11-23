@@ -3,9 +3,8 @@ import type {ReviewResponse} from "./types";
 import { applyDiagnostics } from "./diagnostics";
 import { registerHoverProvider } from "./hover";
 import { registerCodeLensProvider } from "./codelens";
+import { CodeFixProvider } from "./codeActions";
 let diagnosticCollection = vscode.languages.createDiagnosticCollection("deep-code-review");
-
-
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("Deep Code Reviewer Activated!");
@@ -60,6 +59,16 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 	context.subscriptions.push(diagnosticCollection);
+	context.subscriptions.push(
+	vscode.languages.registerCodeActionsProvider(
+		{ scheme: "file", language: "*" },
+		new CodeFixProvider(),
+		{
+		providedCodeActionKinds: CodeFixProvider.metadata.providedCodeActionKinds
+		}
+	)
+	);
+
 }
 
 

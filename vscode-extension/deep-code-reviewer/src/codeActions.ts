@@ -1,41 +1,42 @@
-// import * as vscode from "vscode";
+import * as vscode from "vscode";
 
-// export class CodeFixProvider implements vscode.CodeActionProvider {
+export class CodeFixProvider implements vscode.CodeActionProvider {
 
-//   provideCodeActions(
-//     document: vscode.TextDocument,
-//     range: vscode.Range | vscode.Selection,
-//     context: vscode.CodeActionContext
-//   ): vscode.CodeAction[] {
+  provideCodeActions(
+    document: vscode.TextDocument,
+    range: vscode.Range | vscode.Selection,
+    context: vscode.CodeActionContext
+  ): vscode.CodeAction[] {
 
-//     const actions: vscode.CodeAction[] = [];
+    const actions: vscode.CodeAction[] = [];
 
-//     for (const diagnostic of context.diagnostics) {
-      
+    for (const diagnostic of context.diagnostics) {
+      const code = diagnostic.code as any;
 
-//       const fix = new vscode.CodeAction(
-//         "Apply Suggested Fix",
-//         vscode.CodeActionKind.QuickFix
-//       );
+      if (!code || !code.corrected) continue;
 
-//       fix.diagnostics = [diagnostic];
-//       fix.isPreferred = true;
+      const fix = new vscode.CodeAction(
+        "Apply Suggested Fix",
+        vscode.CodeActionKind.QuickFix
+      );
 
-//       fix.edit = new vscode.WorkspaceEdit();
+      fix.diagnostics = [diagnostic];
+      fix.isPreferred = true;
 
-//       fix.edit.replace(
-//         document.uri,
-//         diagnostic.range,
-//         diagnostic.code
-//       );
+      fix.edit = new vscode.WorkspaceEdit();
+      fix.edit.replace(
+        document.uri,
+        diagnostic.range,
+        code.corrected
+      );
 
-//       actions.push(fix);
-//     }
+      actions.push(fix);
+    }
 
-//     return actions;
-//   }
+    return actions;
+  }
 
-//   static readonly metadata: vscode.CodeActionProviderMetadata = {
-//     providedCodeActionKinds: [vscode.CodeActionKind.QuickFix]
-//   };
-// }
+  static readonly metadata: vscode.CodeActionProviderMetadata = {
+    providedCodeActionKinds: [vscode.CodeActionKind.QuickFix]
+  };
+}

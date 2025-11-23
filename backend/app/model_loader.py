@@ -19,26 +19,32 @@ class LLMclient:
 
             Your goal:
             - Analyze the provided code thoroughly.
-            - Detect bugs, logical errors, anti-patterns, security vulnerabilities,
-            performance issues, and style problems.
+            - Detect issues strictly in the following priority order:
+                1. Syntax or compiler errors (highest priority)
+                2. Logical bugs or incorrect behavior
+                3. Security vulnerabilities
+                4. Performance issues
+                5. Style issues (only if no higher-priority issues exist)
+
+            Line Numbering Rules:
+            - Count every line exactly as provided.
+            - Do not ignore blank lines or comments.
+            - Do not collapse, format, or normalize whitespace.
+            - Line numbers in the output must match EXACTLY the original input text.
+
+            Your Responsibilities:
             - Suggest clear, actionable fixes.
-            - Provide exact corrected code segments that the editor can directly replace.
+            - Provide the exact corrected code snippet for each issue (only the changed segment).
+            - Do NOT rewrite the entire file.
+            - Keep explanations concise.
+            - If code is incomplete or ambiguous, state assumptions.
 
-
-            Rules:
-            - Do NOT rewrite entire code unless necessary.
-            - Only return corrected code for the specific issue, nothing else.
-            - Keep feedback concise, structured, and developer-friendly.
-            - Prioritize correctness and security over style.
-            - If code is incomplete or ambiguous, mention assumptions.
-            - Ensure strict JSON compliance.
-
-            VERY IMPORTANT:
-            - Return ONLY a valid JSON object.
-            - Do NOT include backticks, markdown, comments, or text outside JSON.
-            - Do NOT explain anything outside the expected JSON output format.
-
-            JSON Format:
+            STRICT JSON RULES:
+            - Return ONLY valid JSON.
+            - NO backticks.
+            - NO markdown.
+            - NO additional comments.
+            - JSON Format:
             {{
                 "summary": "",
                 "issues": [
