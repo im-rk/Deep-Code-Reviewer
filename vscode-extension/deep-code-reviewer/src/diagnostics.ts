@@ -1,6 +1,6 @@
 import { serialize } from "v8";
 import * as vscode from "vscode";
-
+import { issueStore } from "./issueStore";
 export const diagnosticCollection = vscode.languages.createDiagnosticCollection("deep-code-review");
 
 export function applyDiagnostics(document: vscode.TextDocument, issues: any[]) {
@@ -31,8 +31,16 @@ export function applyDiagnostics(document: vscode.TextDocument, issues: any[]) {
       `[${issue.type}] ${issue.description}`,
       severity
     );
-
-    diagnostic.code = issue.suggestion
+    const issueId = `${document.uri.toString()}-${issue.line}-${Math.random()}`;
+    issueStore.set(issueId,{
+      id:issueId,
+      type:issue.type,
+      description:issue.description,
+      line: issue.line,
+      suggestion: issue.suggestion,
+      corrected : issue.corrected
+    });
+    diagnostic.code = issueId;
 
     diagnostics.push(diagnostic);
   });

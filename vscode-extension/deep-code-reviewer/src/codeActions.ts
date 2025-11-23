@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-
+import { issueStore } from "./issueStore";
 export class CodeFixProvider implements vscode.CodeActionProvider {
 
   provideCodeActions(
@@ -11,12 +11,12 @@ export class CodeFixProvider implements vscode.CodeActionProvider {
     const actions: vscode.CodeAction[] = [];
 
     for (const diagnostic of context.diagnostics) {
-      const code = diagnostic.code as any;
-
-      if (!code || !code.corrected) continue;
+      const issueId=String(diagnostic.code); 
+      const issueData=issueStore.get(issueId);
+      if (!issueData || !issueData.corrected) continue;
 
       const fix = new vscode.CodeAction(
-        "Apply Suggested Fix",
+        "💡 Deep Code Review: Apply Suggested Fix",
         vscode.CodeActionKind.QuickFix
       );
 
@@ -27,7 +27,7 @@ export class CodeFixProvider implements vscode.CodeActionProvider {
       fix.edit.replace(
         document.uri,
         diagnostic.range,
-        code.corrected
+        issueData.corrected
       );
 
       actions.push(fix);
