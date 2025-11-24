@@ -30,6 +30,11 @@ export class CodeFixProvider implements vscode.CodeActionProvider {
         issueData.corrected
       );
 
+      fix.command={
+        title :"Clear diagnostic after fix",
+        command:"deepCodeReview.clearSingleDiagnostic",
+        arguments:[document.uri,diagnostic]
+      };
       actions.push(fix);
     }
 
