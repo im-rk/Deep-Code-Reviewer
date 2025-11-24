@@ -4,12 +4,23 @@ import { applyDiagnostics } from "./diagnostics";
 import { registerHoverProvider } from "./hover";
 import { registerCodeLensProvider } from "./codelens";
 import { CodeFixProvider } from "./codeActions";
-let diagnosticCollection = vscode.languages.createDiagnosticCollection("deep-code-review");
+import { diagnosticCollection } from "./diagnostics";
 
 export function activate(context: vscode.ExtensionContext) {
 	console.log("Deep Code Reviewer Activated!");
 	registerHoverProvider(context);
 	registerCodeLensProvider(context);
+	vscode.commands.registerCommand(
+		"deepCodeReview.clearSingleDiagnostic",
+		(uri:vscode.Uri,diagtoRemove:vscode.Diagnostic)=>{
+			const existing=diagnosticCollection.get(uri);
+			if(!existing){
+				return ;
+			}
+			const updated=existing.filter(d=>d!=diagtoRemove);
+			diagnosticCollection.set(uri,updated);
+		}
+	);
 	let disposable = vscode.commands.registerCommand("deepCodeReviewer.reviewCode", async () => {
 
 		const editor = vscode.window.activeTextEditor;
